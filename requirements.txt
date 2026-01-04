@@ -4,3 +4,4 @@ numpy
 pefile
 requests
 gunicorn
+tldextract
