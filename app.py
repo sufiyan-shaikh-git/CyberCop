@@ -5,6 +5,7 @@ import pickle
 import pefile
 import os
 import zipfile
+import tldextract
 import numpy as np
 import gc  # Garbage Collector (RAM bachane ke liye)
 
@@ -107,40 +108,45 @@ def extract_pe_features(file_path):
 # ==========================================
 
 def check_url_ai(url):
-    # 1. Safai (URL cleaning)
-    # Http aur www hata do taaki check karna aasaan ho
-    clean_url = url.lower().replace("https://", "").replace("http://", "").replace("www.", "")
-    
     # ==========================================
-    # 0. VIP TRUSTED DOMAINS (Inpar aankh band karke bharosa karo) 🛡️
+    # 1. VIP DOMAIN CHECK (Using TLD Extract - The Professional Way) 🛡️
     # ==========================================
-    trusted_domains = [
-        'google.com', 'accounts.google.com', 'youtube.com', 
-        'facebook.com', 'instagram.com', 'twitter.com', 'x.com',
-        'linkedin.com', 'amazon.com', 'netflix.com', 
-        'microsoft.com', 'live.com', 'office.com',
-        'yahoo.com', 'github.com', 'stackoverflow.com',
-        'wikipedia.org', 'apple.com', 'icloud.com'
-    ]
+    # Ye library URL ko tod kar asli domain nikalti hai.
+    # Example 1: 'images.google.com' -> Domain: 'google.com' (SAFE)
+    # Example 2: 'google.com.evil.com' -> Domain: 'evil.com' (NOT SAFE)
     
-    # Logic: Kya URL in domains se SHURU hota hai?
-    # Example: 'google.com/login' -> 'google.com' se match karega -> SAFE
-    # Example: 'google-login-fake.com' -> Match nahi karega -> DANGER
-    
-    for domain in trusted_domains:
-        # Check 1: Ya to URL bilkul exact wahi domain ho
-        # Check 2: Ya fir Domain ke baad '/' ho (Matlab usi site ka page hai)
-        if clean_url == domain or clean_url.startswith(domain + '/'):
-            return "✅ SAFE: Verified Legitimate Website (Trusted Domain)."
+    try:
+        # URL mein scheme (http) nahi hai to laga do taaki extract sahi ho
+        if not url.startswith(('http://', 'https://')):
+            url = 'http://' + url
+            
+        extracted = tldextract.extract(url)
+        # Asli domain combine karo (domain + suffix)
+        main_domain = f"{extracted.domain}.{extracted.suffix}".lower()
+        
+        trusted_domains = [
+            'google.com', 'youtube.com', 'facebook.com', 'instagram.com', 
+            'twitter.com', 'x.com', 'linkedin.com', 'amazon.com', 
+            'netflix.com', 'microsoft.com', 'github.com', 'stackoverflow.com',
+            'wikipedia.org', 'apple.com', 'icloud.com', 'yahoo.com'
+        ]
+        
+        if main_domain in trusted_domains:
+            return f"✅ SAFE: Verified Official Website ({main_domain})"
+            
+    except Exception as e:
+        print(f"Extraction Error: {e}")
+        # Agar error aaye to niche AI check par gir jao
 
     # ==========================================
-    # 1. Model Loading (Silent)
+    # 2. LOAD AI MODEL (Silent)
     # ==========================================
     is_model_loaded = load_url_model_only()
     
     # ==========================================
-    # 2. KEYWORD CHECK (Ab ye sirf Unknown sites par chalega) 🚨
+    # 3. KEYWORD CHECK (Backup Protection) 🚨
     # ==========================================
+    clean_url_str = url.lower()
     suspicious_keywords = [
         'verify', 'update', 'confirm', 'suspend', 'restrict', 'block', 'expire', 
         'action', 'required', 'unauthorized', 'alert', 'warning',
@@ -150,14 +156,15 @@ def check_url_ai(url):
     ]
     
     for word in suspicious_keywords:
-        if word in clean_url:
+        if word in clean_url_str:
             return f"🚨 DANGER: Malicious Keyword Detected ('{word}') in Unknown Site"
 
     # ==========================================
-    # 3. AI CHECK (Only for Unknown Sites)
+    # 4. AI CHECK
     # ==========================================
     if is_model_loaded and url_model:
         try:
+            # Model ke liye raw url string bhejo
             prediction = url_model.predict([url])[0]
             if prediction == 'bad':
                 return "🚨 DANGER: AI Detected Phishing Link!"
@@ -243,4 +250,5 @@ def scan_file():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
 
