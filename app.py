@@ -10,51 +10,64 @@ import numpy as np
 app = Flask(__name__)
 
 # ==========================================
-# GLOBAL VARIABLES (Models abhi None rahenge)
+# GLOBAL VARIABLES (Models initially None)
 # ==========================================
 url_model = None
 file_model = None
 
 # ==========================================
-# 1. SMART LOADER (Lazy Loading)
+# 1. SMART SEPARATE LOADERS (RAM Saving Fix)
 # ==========================================
-# Ye function tabhi chalega jab koi user scan karega via button
-def load_models_if_needed():
-    global url_model, file_model
+
+def load_url_model_only():
+    global url_model
+    # Agar pehle se loaded hai to wapas mat load karo
+    if url_model is not None:
+        return
+
+    print("⏳ Loading ONLY URL Model...")
     
-    # Check 1: Unzip if needed
-    for model_name in ['phishing_model', 'malware_model']:
-        if not os.path.exists(model_name + '.pkl') and os.path.exists(model_name + '.zip'):
-            print(f"📂 Unzipping {model_name}...")
-            try:
-                with zipfile.ZipFile(model_name + '.zip', 'r') as zip_ref:
-                    zip_ref.extractall()
-            except: pass
-
-    # Check 2: Load URL Model
-    if url_model is None:
-        print("⏳ Loading URL Model into RAM...")
+    # Check if zip exists and unzip
+    if not os.path.exists('phishing_model.pkl') and os.path.exists('phishing_model.zip'):
         try:
-            with open('phishing_model.pkl', 'rb') as f:
-                url_model = pickle.load(f)
-            print("✅ URL Model Ready")
-        except Exception as e:
-            print(f"⚠️ URL Model Error: {e}")
+            with zipfile.ZipFile('phishing_model.zip', 'r') as zip_ref:
+                zip_ref.extractall()
+        except: pass
 
-    # Check 3: Load Malware Model
-    if file_model is None:
-        print("⏳ Loading Malware Model into RAM...")
+    try:
+        with open('phishing_model.pkl', 'rb') as f:
+            url_model = pickle.load(f)
+        print("✅ URL Model Loaded.")
+    except Exception as e:
+        print(f"⚠️ URL Model Failed: {e}")
+
+def load_file_model_only():
+    global file_model
+    # Agar pehle se loaded hai to wapas mat load karo
+    if file_model is not None:
+        return
+
+    print("⏳ Loading ONLY Malware Model...")
+
+    # Check if zip exists and unzip
+    if not os.path.exists('malware_model.pkl') and os.path.exists('malware_model.zip'):
         try:
-            with open('malware_model.pkl', 'rb') as f:
-                file_model = pickle.load(f)
-            print("✅ Malware Model Ready")
-        except Exception as e:
-            print(f"⚠️ Malware Model Error: {e}")
+            with zipfile.ZipFile('malware_model.zip', 'r') as zip_ref:
+                zip_ref.extractall()
+        except: pass
+
+    try:
+        with open('malware_model.pkl', 'rb') as f:
+            file_model = pickle.load(f)
+        print("✅ Malware Model Loaded.")
+    except Exception as e:
+        print(f"⚠️ Malware Model Failed: {e}")
+
 
 # ==========================================
 # 2. HELPER FUNCTIONS
 # ==========================================
-
+# (Ye Tokenizer zaroori hai URL model ke liye)
 def make_tokens(f):
     tokens_by_slash = str(f).split('/')
     total_tokens = []
@@ -91,11 +104,12 @@ def extract_pe_features(file_path):
         return None
 
 # ==========================================
-# 3. DETECTION LOGIC
+# 3. DETECTION LOGIC (Targeted Loading)
 # ==========================================
 
 def check_url_ai(url):
-    load_models_if_needed() # <--- YAHAN LOAD HOGA (JAB ZAROORAT HO)
+    # SIRF URL MODEL LOAD KARO
+    load_url_model_only()
     
     suspicious_keywords = ['free-money', 'hack', 'crack', 'unlimited', 'bonus', 'bank-update']
     for word in suspicious_keywords:
@@ -111,12 +125,10 @@ def check_url_ai(url):
                 return "✅ SAFE: Link appears legitimate."
         except:
             return "⚠️ Error scanning URL."
-    return "⚠️ URL Model not loaded (Check Logs)."
+    return "⚠️ URL Model could not load (RAM Issue)."
 
 def check_file_hybrid(file_path):
-    load_models_if_needed() # <--- YAHAN LOAD HOGA
-    
-    # Database Check
+    # DATABASE CHECK KE LIYE MODEL KI ZAROORAT NAHI
     sha256_hash = hashlib.sha256()
     with open(file_path, "rb") as f:
         for byte_block in iter(lambda: f.read(4096), b""):
@@ -132,8 +144,10 @@ def check_file_hybrid(file_path):
                 return f"🚨 DANGER (Database): Known Virus Detected! ({malware['description']})"
         except: pass
 
-    # AI Check
+    # SIRF AB LOAD KARO FILE MODEL (Agar DB me nahi mila)
     if file_path.endswith('.exe') or file_path.endswith('.dll'):
+        load_file_model_only() # <--- Load only here
+        
         if file_model:
             features = extract_pe_features(file_path)
             if features is not None:
@@ -146,6 +160,7 @@ def check_file_hybrid(file_path):
         return "⚠️ Malware Model not loaded."
     
     return "ℹ️ Info: Only .exe files are scanned by AI. File hash is Safe."
+
 
 # ==========================================
 # 4. ROUTES
@@ -165,7 +180,6 @@ def scan_url():
 def scan_file():
     if 'file' not in request.files:
         return jsonify({'result': "No file uploaded"})
-    
     file = request.files['file']
     if file.filename == '':
         return jsonify({'result': "No file selected"})
@@ -173,7 +187,6 @@ def scan_file():
     upload_folder = 'static/uploads'
     if not os.path.exists(upload_folder):
         os.makedirs(upload_folder)
-    
     file_path = os.path.join(upload_folder, file.filename)
     file.save(file_path)
 
