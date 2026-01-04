@@ -1,8 +1,6 @@
 Flask
 scikit-learn
-pandas
 numpy
 pefile
-tldextract
 requests
 gunicorn
