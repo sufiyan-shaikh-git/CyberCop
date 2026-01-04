@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CYBER COP | Advanced Threat Detection</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <div class="header-container">
+        <h1>CYBER COP <i class="fas fa-shield-alt"></i></h1>
+        <div class="subtitle">AI-POWERED THREAT INTELLIGENCE SYSTEM</div>
+        <div class="creator-tag">
+            Created By: <span class="creator-name">SUFIYAN SHAIKH</span>
+        </div>
+    </div>
+
+    <div class="main-container">
+        
+        <div class="card">
+            <h2><i class="fas fa-link"></i> Phishing Link Scanner</h2>
+            <p style="color:#ccc;">Paste a URL to analyze it for phishing patterns using AI & Keyword rules.</p>
+            
+            <input type="text" id="urlInput" placeholder="Enter URL (e.g., http://free-prize.com)">
+            <button onclick="scanURL()">INITIATE SCAN <i class="fas fa-radar"></i></button>
+            
+            <div id="urlLoader" class="loader-container">
+                <div class="radar"></div>
+                <div>Scanning neural pathways...</div>
+            </div>
+            <div id="urlResult" class="result-box"></div>
+        </div>
+
+        <div class="card">
+            <h2><i class="fas fa-file-code"></i> Malware File Scanner</h2>
+            <p style="color:#ccc;">Upload .exe/.dll for Signature (Hash) & AI Structure analysis.</p>
+            
+            <input type="file" id="fileInput">
+            <button onclick="scanFile()">ANALYZE FILE <i class="fas fa-microchip"></i></button>
+            
+            <div id="fileLoader" class="loader-container">
+                <div class="radar"></div>
+                <div>Analyzing PE structure & Hash...</div>
+            </div>
+            <div id="fileResult" class="result-box"></div>
+        </div>
+
+    </div>
+
+    <script>
+        function toggleLoader(type, show) {
+            const loader = document.getElementById(`${type}Loader`);
+            const resultBox = document.getElementById(`${type}Result`);
+            if (show) {
+                loader.style.display = 'block';
+                resultBox.style.display = 'none';
+            } else {
+                loader.style.display = 'none';
+                resultBox.style.display = 'block';
+            }
+        }
+
+        async function scanURL() {
+            let url = document.getElementById('urlInput').value;
+            let resultBox = document.getElementById('urlResult');
+
+            if(!url) { alert("Please enter a URL first!"); return; }
+
+            toggleLoader('url', true);
+            let formData = new FormData();
+            formData.append('url', url);
+
+            try {
+                let response = await fetch('/scan_url', {method: 'POST', body: formData});
+                let data = await response.json();
+                toggleLoader('url', false);
+                resultBox.innerHTML = data.result;
+                if(data.result.includes("DANGER") || data.result.includes("Block")) {
+                    resultBox.className = "result-box danger";
+                } else {
+                    resultBox.className = "result-box safe";
+                }
+            } catch (e) {
+                toggleLoader('url', false);
+                resultBox.className = "result-box danger";
+                resultBox.innerText = "⚠️ Server Connection Error.";
+            }
+        }
+
+        async function scanFile() {
+            let fileInput = document.getElementById('fileInput');
+            let resultBox = document.getElementById('fileResult');
+
+            if(fileInput.files.length === 0) { alert("Select a file first!"); return; }
+
+            toggleLoader('file', true);
+            let formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+
+            try {
+                let response = await fetch('/scan_file', {method: 'POST', body: formData});
+                let data = await response.json();
+                toggleLoader('file', false);
+                resultBox.innerHTML = data.result;
+                if(data.result.includes("DANGER")) {
+                    resultBox.className = "result-box danger";
+                } else {
+                    resultBox.className = "result-box safe";
+                }
+            } catch (e) {
+                toggleLoader('file', false);
+                resultBox.className = "result-box danger";
+                resultBox.innerText = "⚠️ Server Connection Error/Timeout.";
+            }
+        }
+    </script>
+</body>
+</html>
