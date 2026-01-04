@@ -107,54 +107,55 @@ def extract_pe_features(file_path):
 # ==========================================
 
 def check_url_ai(url):
-    # Step 1: Try Loading Model (Silent Fail Allowed)
-    is_model_loaded = load_url_model_only()
+    # 1. Safai (URL cleaning)
+    # Http aur www hata do taaki check karna aasaan ho
+    clean_url = url.lower().replace("https://", "").replace("http://", "").replace("www.", "")
     
-    # Step 2: MEGA KEYWORD CHECK (100+ Words) 🚨
-    # Ye list bina AI ke bhi 90% attacks pakad legi
-    suspicious_keywords = [
-        # --- URGENCY & ACTION ---
-        'verify', 'update', 'confirm', 'suspend', 'restrict', 'block', 'expire', 
-        'immediate', 'action', 'required', 'unauthorized', 'alert', 'warning',
-        'secure', 'validate', 'recover', 'unlock', 'reset', 'limited',
-        
-        # --- LOGIN & CREDENTIALS ---
-        'login', 'signin', 'sign-in', 'log-in', 'password', 'credential', 
-        'account', 'profile', 'admin', 'root', 'access', 'auth', 'session',
-        'support', 'security', 'service', 'help', 'client', 'portal',
-        
-        # --- BANKING & FINANCE ---
-        'bank', 'wallet', 'payment', 'transaction', 'invoice', 'bill', 'receipt',
-        'pay', 'fund', 'refund', 'credit', 'debit', 'card', 'statement',
-        'paypal', 'stripe', 'fargo', 'chase', 'citi', 'hsbc', 'axis', 'hdfc', 'icici',
-        
-        # --- CRYPTO & TRADING ---
-        'crypto', 'bitcoin', 'btc', 'ethereum', 'eth', 'binance', 'coinbase', 
-        'trustwallet', 'metamask', 'ledger', 'trezor', 'airdrop', 'nft',
-        
-        # --- OFFERS & FREEBIES ---
-        'free', 'gift', 'prize', 'winner', 'win', 'bonus', 'cash', 'money', 
-        'reward', 'promo', 'deal', 'discount', 'cheap', 'offer', 'giveaway',
-        'lottery', 'sweepstake', 'claim', 'exclusive', 'urgent',
-        
-        # --- BRANDS & SERVICES ---
-        'google', 'gmail', 'drive', 'dropbox', 'microsoft', 'office', 'outlook',
-        'teams', 'zoom', 'netflix', 'amazon', 'apple', 'icloud', 'facebook', 
-        'instagram', 'twitter', 'linkedin', 'whatsapp', 'telegram', 'snapchat',
-        'tiktok', 'shopify', 'fedex', 'dhl', 'usps', 'ups', 'delivery', 'tracking',
-        
-        # --- TECH & FILES ---
-        'download', 'install', 'apk', 'exe', 'update-now', 'fix', 'scan', 
-        'virus', 'malware', 'cleaner', 'browser', 'chrome', 'firefox',
-        'cloud', 'storage', 'doc', 'pdf', 'xls', 'file-share'
+    # ==========================================
+    # 0. VIP TRUSTED DOMAINS (Inpar aankh band karke bharosa karo) 🛡️
+    # ==========================================
+    trusted_domains = [
+        'google.com', 'accounts.google.com', 'youtube.com', 
+        'facebook.com', 'instagram.com', 'twitter.com', 'x.com',
+        'linkedin.com', 'amazon.com', 'netflix.com', 
+        'microsoft.com', 'live.com', 'office.com',
+        'yahoo.com', 'github.com', 'stackoverflow.com',
+        'wikipedia.org', 'apple.com', 'icloud.com'
     ]
     
-    url_lower = url.lower()
-    for word in suspicious_keywords:
-        if word in url_lower:
-            return f"🚨 DANGER: Malicious Keyword Detected ('{word}')"
+    # Logic: Kya URL in domains se SHURU hota hai?
+    # Example: 'google.com/login' -> 'google.com' se match karega -> SAFE
+    # Example: 'google-login-fake.com' -> Match nahi karega -> DANGER
+    
+    for domain in trusted_domains:
+        # Check 1: Ya to URL bilkul exact wahi domain ho
+        # Check 2: Ya fir Domain ke baad '/' ho (Matlab usi site ka page hai)
+        if clean_url == domain or clean_url.startswith(domain + '/'):
+            return "✅ SAFE: Verified Legitimate Website (Trusted Domain)."
 
-    # Step 3: AI CHECK (Only if loaded successfully)
+    # ==========================================
+    # 1. Model Loading (Silent)
+    # ==========================================
+    is_model_loaded = load_url_model_only()
+    
+    # ==========================================
+    # 2. KEYWORD CHECK (Ab ye sirf Unknown sites par chalega) 🚨
+    # ==========================================
+    suspicious_keywords = [
+        'verify', 'update', 'confirm', 'suspend', 'restrict', 'block', 'expire', 
+        'action', 'required', 'unauthorized', 'alert', 'warning',
+        'secure', 'validate', 'recover', 'unlock', 'reset', 'limited',
+        'login', 'signin', 'sign-in', 'log-in', 'password', 'credential', 
+        'account', 'bank', 'wallet', 'payment', 'pay', 'fund', 'bonus', 'free'
+    ]
+    
+    for word in suspicious_keywords:
+        if word in clean_url:
+            return f"🚨 DANGER: Malicious Keyword Detected ('{word}') in Unknown Site"
+
+    # ==========================================
+    # 3. AI CHECK (Only for Unknown Sites)
+    # ==========================================
     if is_model_loaded and url_model:
         try:
             prediction = url_model.predict([url])[0]
@@ -162,11 +163,9 @@ def check_url_ai(url):
                 return "🚨 DANGER: AI Detected Phishing Link!"
             else:
                 return "✅ SAFE: Link appears legitimate (AI Verified)."
-        except:
-            pass # Silent Fail -> Fallback to Safe
+        except: pass
     
-    # Step 4: FALLBACK (Agar AI load nahi hua to Safe bol do)
-    return "✅ SAFE: Link appears legitimate (Basic Scan Verified)."
+    return "✅ SAFE: Link appears legitimate."
 
 
 def check_file_hybrid(file_path):
@@ -244,3 +243,4 @@ def scan_file():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
