@@ -169,15 +169,47 @@ document.getElementById('feedback-form').addEventListener('submit', function() {
            
         </div>
     </div>
-   
+    <div class="faq-container">
+        <h2 class="faq-title">Frequently Asked Questions</h2>
+    
+        <div class="faq-item">
+            <button class="faq-question" onclick="toggleFAQ(this)">
+                How can you identify a suspicious URL?
+                <span class="faq-icon">+</span>
+            </button>
+            <div class="faq-answer">
+                <p>Suspicious URLs often have unusual domain names, spelling errors (e.g., g00gle.com instead of google.com), or use HTTP instead of HTTPS. CyberCop AI analyzes these hidden patterns for you.</p>
+            </div>
+        </div>
+    
+        <div class="faq-item">
+            <button class="faq-question" onclick="toggleFAQ(this)">
+                What happens if you click on a malicious link?
+                <span class="faq-icon">+</span>
+            </button>
+            <div class="faq-answer">
+                <p>Clicking a malicious link can lead to malware installation, credential theft, or phishing attacks. Always scan unknown links with CyberCop before opening them.</p>
+            </div>
+        </div>
+    
+        <div class="faq-item">
+            <button class="faq-question" onclick="toggleFAQ(this)">
+                Will CyberCop scan the entire website at once?
+                <span class="faq-icon">+</span>
+            </button>
+            <div class="faq-answer">
+                <p>CyberCop scans the specific URL provided. For deep file scanning, use our 'File Scan' feature to check individual attachments for malicious signatures.</p>
+            </div>
+        </div>
+    </div>
     <div class="footer-policy-box">
         <h4>CyberCop Privacy Policy</h4>
         <p><strong>Data Privacy:</strong> CyberCop does not store, log, or track any personal data or scan history. All analyses are performed in real-time for your security.</p>
         <p><strong>Heuristic Analysis:</strong> Our AI models analyze file structures locally. No data is shared with third parties or used for model training.</p>
         <p><strong>Contact:</strong> For inquiries, use the feedback form in the side menu. Created by Sufiyan Shaikh (MrKim).</p>
         <p>Contact Developer: <b>sufiyan77744@gmail.com.com</b></p>
-        <p>Developed by: <b>Sufiyan Shaikh (MrKim) designer: Rehan Quadri</b></p>
-        <p> copyright-text <b>©2026 CyberCop | All Rights Reserved</b></p>
+        <p>Developed by: <b>Sufiyan Shaikh (MrKim) designer: Rehan</b></p>
+        <p> class="copyright-text">© 2026 CyberCop | All Rights Reserved</p>
        
     </div>
    
@@ -223,9 +255,34 @@ document.getElementById('feedback-form').addEventListener('submit', function() {
          * - 'toggleSidebar' animation CSS class '.active' par depend karti hai.
          * - Form reset logic Formspree ke redirection ke baad trigger hota hai.
          */
+
+         // Function: FAQ Toggle Logic
+             function toggleFAQ(button) 
+            {
+             const item = button.parentElement;
+             const answer = button.nextElementSibling;
+
+                 // Dusre sabhi open FAQs ko band karne ke liye
+                 document.querySelectorAll('.faq-item').forEach(otherItem => {
+                if (otherItem !== item) 
+               {
+                  otherItem.classList.remove('active');
+                 otherItem.querySelector('.faq-answer').style.maxHeight = null;
+               }
+                });
+
+                   // Current FAQ ko toggle karein
+              item.classList.toggle('active');
+             if (item.classList.contains('active')) 
+             {
+                answer.style.maxHeight = answer.scrollHeight + "px";
+             } else 
+             {
+              answer.style.maxHeight = null;
+             }
+           }
     </script>
 </body>
 </html>
 </body>
 </html>
-
