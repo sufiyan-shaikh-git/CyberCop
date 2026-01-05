@@ -345,4 +345,73 @@ button:hover {
     border-radius: 10px;
 }
 
+/* FAQ Container Style */
+.faq-container {
+    max-width: 800px;
+    margin: 50px auto;
+    padding: 20px;
+}
 
+.faq-title {
+    color: #00ffff;
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 1.8rem;
+}
+
+/* Individual FAQ Item Box */
+.faq-item {
+    background: rgba(20, 20, 20, 0.6);
+    border: 1px solid #333;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    overflow: hidden;
+    transition: 0.3s;
+}
+
+.faq-item:hover {
+    border-color: #00ffff;
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
+}
+
+/* Question Button */
+.faq-question {
+    width: 100%;
+    padding: 20px;
+    background: none;
+    border: none;
+    color: white;
+    text-align: left;
+    font-size: 1.1rem;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Answer Box (Hidden by default) */
+.faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.faq-answer p {
+    padding: 20px;
+    color: #bbbbbb;
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* Icon Animation */
+.faq-icon {
+    color: #00ffff;
+    font-size: 1.5rem;
+    transition: transform 0.3s;
+}
+
+.faq-item.active .faq-icon {
+    transform: rotate(45deg);
+    color: #ff00ff;
+}
