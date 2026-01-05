@@ -204,3 +204,145 @@ button:hover {
     h1 { font-size: 2.5rem; }
     .main-container { flex-direction: column; align-items: center; }
 }
+
+
+
+/* --- SIDEBAR SCROLLBAR ENABLE --- */
+.side-tab {
+    position: fixed;
+    right: -400px;
+    top: 0;
+    width: 350px;
+    height: 100vh;
+    background: rgba(10, 10, 10, 0.98);
+    z-index: 9999;
+    transition: 0.5s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    color: white;
+
+    /* Ye line scrollbar ko wapas layegi agar content zyada ho */
+    overflow-y: auto; 
+    overflow-x: hidden; /* Side mein scroll na ho sirf upar-niche ho */
+}
+
+/* --- CUSTOM NEON SCROLLBAR DESIGN --- */
+/* Scrollbar ki width */
+.side-tab::-webkit-scrollbar {
+    width: 6px;
+}
+
+/* Scrollbar ka track (pichla hissa) */
+.side-tab::-webkit-scrollbar-track {
+    background: #1a1a1a;
+}
+
+/* Scrollbar ka thumb (jo move hota hai) - Neon Cyan Look */
+.side-tab::-webkit-scrollbar-thumb {
+    background: linear-gradient(to bottom, #00ffff, #ff00ff);
+    border-radius: 10px;
+    box-shadow: 0 0 10px #00ffff;
+}
+
+/* Hover karne par scrollbar thoda chamkega */
+.side-tab::-webkit-scrollbar-thumb:hover {
+    background: #00ffff;
+}
+
+/* 2. FOOTER POLICY BOX STYLE (Simple & Clean) */
+.footer-policy-box {
+    margin: 50px auto;
+    padding: 20px;
+    max-width: 900px;
+    border-top: 1px solid #333; /* Sirf ek patli line */
+    text-align: center;
+}
+
+.footer-policy-box h4 {
+    color: #00ffff; /* CyberCop Theme Color */
+    margin-bottom: 10px;
+    font-size: 1.2rem;
+}
+
+.footer-policy-box p {
+    color: #bbbbbb; /* Simple gray font color */
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin-bottom: 8px;
+}
+/* Jab hum button dabate hain, tab ye class add hoti hai */
+.side-tab.active {
+    right: 0; /* Sidebar screen par aa jayega */
+}
+
+/* Close button ki position */
+.close-btn {
+    align-self: flex-end;
+    background: none;
+    border: none;
+    color: #ff00ff;
+    font-size: 30px;
+    cursor: pointer;
+}
+/* Floating button jo screen par dikhega */
+/* Floating button ko chota aur Top-Right mein set karne ke liye */
+.floating-info-btn {
+    position: fixed;
+    right: 20px;   /* Right se doori */
+    top: 20px;     /* Bottom ki jagah Top se doori */
+    width: 50px;   /* Button ki width fix ki */
+    height: 50px;  /* Button ki height fix ki */
+    background: linear-gradient(45deg, #00ffff, #ff00ff);
+    border: none;
+    border-radius: 50%; /* Perfect circle */
+    cursor: pointer;
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.6);
+    z-index: 1001; /* Sabse upar dikhega */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s ease;
+}
+
+/* Hover karne par thoda bada hoga */
+.floating-info-btn:hover {
+    transform: scale(1.1);
+}
+
+/* Button ke andar ka text/icon style */
+.floating-info-btn span {
+    font-size: 12px;
+    font-weight: bold;
+    color: white;
+    text-transform: uppercase;
+}
+
+/* Inputs aur Textarea style */
+#feedback-form input, #feedback-form textarea 
+{
+    width: 100%;
+    margin-bottom: 10px;
+    background: #222;
+    border: 1px solid #444;
+    color: white;
+    padding: 10px;
+}
+
+/* new  Sidebar Scroller Logic */
+.sidebar-scroll-container {
+    height: 90vh; /* Screen height ka 90% */
+    overflow-y: auto; /* Content zyada ho to scroller apne aap aa jayega */
+    padding-right: 10px;
+}
+
+/* Custom Scrollbar Styling (Neon Look) */
+.sidebar-scroll-container::-webkit-scrollbar {
+    width: 5px;
+}
+.sidebar-scroll-container::-webkit-scrollbar-thumb {
+    background: #00ffff;
+    border-radius: 10px;
+}
+
+
