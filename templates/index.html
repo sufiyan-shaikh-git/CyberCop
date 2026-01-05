@@ -117,6 +117,114 @@
                 resultBox.innerText = "⚠️ Server Connection Error/Timeout.";
             }
         }
+        /**
+ * CYBERCOP SIDEBAR LOGIC
+ * Created by: Sufiyan Shaikh (MrKim)
+ */
+
+// Function: Sidebar ko kholne ya band karne ke liye
+function toggleSidebar() 
+{
+    const sidebar = document.getElementById('side-tab');
+    
+    // Check karta hai ki kya 'active' class pehle se hai
+    if (sidebar.classList.contains('active')) {
+        // Agar hai to hata do (Band kar do)
+        sidebar.classList.remove('active');
+    } else {
+        // Agar nahi hai to laga do (Khol do)
+        sidebar.classList.add('active');
+    }
+}
+
+// Function: Form submit hone par storage ki bachat aur user feedback
+document.getElementById('feedback-form').addEventListener('submit', function() {
+    // Ye message user ko dikhega jab email bhej diya jayega
+    alert('Thank you! Developer got Your feedback successfully.');
+    
+    // Sidebar ko apne aap band karne ke liye
+    setTimeout(toggleSidebar, 1000); 
+});
     </script>
+    <div id="side-tab" class="side-tab">
+        <button class="close-btn" onclick="toggleSidebar()">×</button>
+        
+        <div class="sidebar-content">
+            <h3>CyberCop Info Portal</h3>
+            <hr class="neon-line">
+    
+            <section id="feedback-section">
+                <h4>Feedback & Contact</h4>
+                <p>Your feedback will be sent direct to  Sufiyan(MrKim).</p>
+                <form action="https://formspree.io/f/xkogelqa" method="POST" id="feedback-form">
+                    <input type="text" name="name" placeholder="Your Name" required>
+                    <input type="email" name="_replyto" placeholder="Your Email" required>
+                    <textarea name="message" placeholder="Your feedback Or Question..." required></textarea>
+                    <button type="submit" class="neon-btn">Send Message</button>
+                </form>
+            </section>
+    
+            <hr class="neon-line">
+    
+           
+        </div>
+    </div>
+   
+    <div class="footer-policy-box">
+        <h4>CyberCop Privacy Policy</h4>
+        <p><strong>Data Privacy:</strong> CyberCop does not store, log, or track any personal data or scan history. All analyses are performed in real-time for your security.</p>
+        <p><strong>Heuristic Analysis:</strong> Our AI models analyze file structures locally. No data is shared with third parties or used for model training.</p>
+        <p><strong>Contact:</strong> For inquiries, use the feedback form in the side menu. Created by Sufiyan Shaikh (MrKim).</p>
+        <p>Contact Developer: <b>sufiyan77744@gmail.com.com</b></p>
+        <p>Developed by: <b>Sufiyan Shaikh (MrKim) designer: Rehan</b></p>
+        <p> class="copyright-text">© 2026 CyberCop | All Rights Reserved</p>
+       
+    </div>
+   
+    
+    <button class="floating-info-btn" onclick="toggleSidebar()">
+        <span>Info</span>
+    </button>
+    <script>
+        // ============================================================
+        // SIDEBAR & FEEDBACK LOGIC - DEVELOPED BY SUFIYAN (MRKIM)
+        // ============================================================
+    
+        // 1. Function: Sidebar ko kholne aur band (toggle) karne ke liye
+        function toggleSidebar() {
+            // 'side-tab' id wale element mein 'active' class add ya remove karta hai
+            document.getElementById('side-tab').classList.toggle('active');
+        }
+    
+        // 2. Logic: Form submit hone ke baad auto-clear karne ke liye
+        // Hum window.onload use kar rahe hain taaki script tabhi chale jab page load ho jaye
+        window.onload = function() {
+            const feedbackForm = document.getElementById('feedback-form');
+    
+            if (feedbackForm) {
+                feedbackForm.addEventListener('submit', function(event) {
+                    // Form submit hone ke 1 second baad ye code chalega
+                    setTimeout(function() {
+                        // Form ke saare input fields (Name, Message) ko khaali kar deta hai
+                        feedbackForm.reset();
+                        
+                        // User ko ek simple success message dikhata hai
+                        alert('Thank you! Sufiyan (MrKim) ko aapka feedback mil gaya hai.');
+                        
+                        // Form clear hone ke baad sidebar ko apne aap band kar deta hai
+                        toggleSidebar();
+                    }, 1000); 
+                });
+            }
+        };
+    
+        /** * NOTE FOR FUTURE UPDATES:
+         * - Agar naya button add karna ho toh bas naya function banayein.
+         * - 'toggleSidebar' animation CSS class '.active' par depend karti hai.
+         * - Form reset logic Formspree ke redirection ke baad trigger hota hai.
+         */
+    </script>
+</body>
+</html>
 </body>
 </html>
